@@ -22,7 +22,7 @@ export default function Navbar() {
       <div className="container mx-auto flex justify-between items-center">
         <div className="flex items-center gap-6">
           <h1 className="text-xl font-bold">
-            <Image src="/logo-light.webp" alt="Logo" className="h-8" />
+            <Image src="/logo-light.webp" width="40" height="100" alt="Logo" className="h-8" />
           </h1>
           {isAdmin && (
             <div className="flex gap-4">
@@ -55,12 +55,13 @@ export default function Navbar() {
           <span className="text-gray-300">
             {session?.user.email}
           </span>
+          {session && session?.user && 
           <button
             onClick={handleLogout}
             className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded text-white transition-colors"
           >
             Logout
-          </button>
+          </button>}
         </div>
       </div>
     </nav>
