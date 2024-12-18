@@ -1,7 +1,8 @@
 // src/lib/auth.ts
+import { prisma } from '@/lib/prisma'  // Add this import
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions } from "next-auth"
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -12,16 +13,14 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            throw new Error("Email and password required");
-          }
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Email and password required");
+        }
 
+        try {
           const user = await prisma.user.findUnique({
             where: { email: credentials.email }
           });
-
-          console.log('Found user:', user); // Debug log
 
           if (!user || !user.password) {
             throw new Error("User not found");
@@ -32,21 +31,21 @@ export const authOptions: NextAuthOptions = {
             user.password
           );
 
-          console.log('Password valid:', isPasswordValid); // Debug log
-
           if (!isPasswordValid) {
             throw new Error("Invalid password");
           }
 
           return user;
         } catch (error) {
-          console.error('Auth error:', error); // Debug log
-          throw error;
+          console.error('Auth error:', error);
+          return null;
         }
       }
     })
   ],
-  debug: true, // Enable debug mode
+  pages: {
+    signIn: '/login',
+  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -57,13 +56,10 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role;
-        session.user.id = token.id;
+        session.user.role = token.role as string;
+        session.user.id = token.id as string;
       }
       return session;
     }
-  },
-  pages: {
-    signIn: '/login',
   }
 }
