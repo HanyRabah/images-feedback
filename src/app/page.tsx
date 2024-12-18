@@ -11,10 +11,11 @@ export default async function Home() {
     redirect('/login')
   }
 
-  // if (session.user.role === 'ADMIN') {
-  //   redirect('/admin')
-  // } else {
-  //   redirect('/client')
-  // }
+  if (session.user.role === 'ADMIN') {
+    redirect('/admin')
+  } else {
+    redirect('/client')
+  }
+  
   return <div><Navbar /></div>
 }
