@@ -30,23 +30,27 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
-
+  
     try {
+      console.log('Attempting login with:', credentials.email); // Debug log
+      
       const result = await signIn('credentials', {
         email: credentials.email,
         password: credentials.password,
-        redirect: false
+        redirect: false,
+        callbackUrl: '/'
       })
-
+  
+      console.log('Login result:', result); // Debug log
+  
       if (result?.error) {
         setError('Invalid email or password')
       } else {
-        // Refresh will trigger the useEffect above
-        router.refresh()
+        router.push(result?.url || '/')
       }
     } catch (error) {
+      console.error('Login error:', error); // Debug log
       setError('An unexpected error occurred')
-      console.error(error)
     } finally {
       setIsLoading(false)
     }

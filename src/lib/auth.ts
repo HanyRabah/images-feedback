@@ -12,34 +12,41 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials");
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            throw new Error("Email and password required");
+          }
+
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email }
+          });
+
+          console.log('Found user:', user); // Debug log
+
+          if (!user || !user.password) {
+            throw new Error("User not found");
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            credentials.password,
+            user.password
+          );
+
+          console.log('Password valid:', isPasswordValid); // Debug log
+
+          if (!isPasswordValid) {
+            throw new Error("Invalid password");
+          }
+
+          return user;
+        } catch (error) {
+          console.error('Auth error:', error); // Debug log
+          throw error;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
-        });
-
-        if (!user || !user.password) {
-          throw new Error("Invalid credentials");
-        }
-
-        const isCorrectPassword = await bcrypt.compare(
-          credentials.password,
-          user.password
-        );
-
-        if (!isCorrectPassword) {
-          throw new Error("Invalid credentials");
-        }
-
-        return user;
       }
     })
   ],
-  pages: {
-    signIn: '/login',
-  },
+  debug: true, // Enable debug mode
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -50,10 +57,13 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.role = token.role as string;
-        session.user.id = token.id as string;
+        session.user.role = token.role;
+        session.user.id = token.id;
       }
       return session;
     }
+  },
+  pages: {
+    signIn: '/login',
   }
 }
