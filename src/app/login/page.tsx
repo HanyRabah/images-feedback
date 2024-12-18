@@ -1,68 +1,43 @@
 // src/app/login/page.tsx
 'use client'
 
-import { signIn, useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { signIn } from 'next-auth/react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: ''
-  })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
-  const { data: session } = useSession()
 
-  // Handle redirect based on user role
-  useEffect(() => {
-    if (session?.user?.role) {
-      if (session.user.role === 'ADMIN') {
-        router.push('/admin')
-      } else if (session.user.role === 'CLIENT') {
-        router.push('/client')
-      }
-    }
-  }, [session, router])
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     setError('')
-  
+
+    const formData = new FormData(e.currentTarget)
+    const email = formData.get('email') as string
+    const password = formData.get('password') as string
+
     try {
-      console.log('Attempting login with:', credentials.email); // Debug log
-      
       const result = await signIn('credentials', {
-        email: credentials.email,
-        password: credentials.password,
-        redirect: false,
-        callbackUrl: '/'
+        email,
+        password,
+        redirect: false
       })
-  
-      console.log('Login result:', result); // Debug log
-  
+
       if (result?.error) {
         setError('Invalid email or password')
       } else {
-        router.push(result?.url || '/')
+        // Get session to determine redirect
+        router.push('/')
+        router.refresh()
       }
     } catch (error) {
-      console.error('Login error:', error); // Debug log
-      setError('An unexpected error occurred')
+      setError('An error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
-  }
-
-  // If already authenticated, show loading state
-  if (session) {
-    return (
-      <div className="container mx-auto p-6 max-w-md text-center">
-        <div className="animate-pulse">Redirecting...</div>
-      </div>
-    )
   }
 
   return (
@@ -81,15 +56,11 @@ export default function LoginPage() {
             Email
           </label>
           <input
-            type="email"
             id="email"
-            value={credentials.email}
-            onChange={(e) => setCredentials(prev => ({
-              ...prev,
-              email: e.target.value
-            }))}
-            className="w-full border rounded-lg p-2"
+            name="email"
+            type="email"
             required
+            className="w-full border rounded-lg p-2"
           />
         </div>
         <div>
@@ -97,15 +68,11 @@ export default function LoginPage() {
             Password
           </label>
           <input
-            type="password"
             id="password"
-            value={credentials.password}
-            onChange={(e) => setCredentials(prev => ({
-              ...prev,
-              password: e.target.value
-            }))}
-            className="w-full border rounded-lg p-2"
+            name="password"
+            type="password"
             required
+            className="w-full border rounded-lg p-2"
           />
         </div>
         <button
