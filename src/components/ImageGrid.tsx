@@ -18,7 +18,6 @@ export function ImageGrid({ images, client, onStatusUpdate }: {
   const [showFeedback, setShowFeedback] = useState<string | null>(null)
   const [isCarouselOpen, setIsCarouselOpen] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  console.log("🚀 ~ currentImageIndex:", currentImageIndex)
 
   const handleDeleteImage = async (imageId: string) => {
     if (!confirm('Are you sure you want to delete this image?')) return;
