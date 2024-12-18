@@ -4,7 +4,7 @@
 import { useState } from 'react'
 
 export default function TestAuth() {
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<{ email?: string; password?: string; error?: string } | null>(null)
 
   const testAuth = async () => {
     try {
