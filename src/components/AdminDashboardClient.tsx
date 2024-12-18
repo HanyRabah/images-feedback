@@ -75,7 +75,7 @@ export default function AdminDashboardClient({ initialClients = [] }) {
           onClick={() => setShowCreateClient(true)}
           className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
         >
-          Create Project
+          Create Client
         </button>
       </div>
       
@@ -92,7 +92,7 @@ export default function AdminDashboardClient({ initialClients = [] }) {
                   href={`/admin/upload/${client.id}`}
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                 >
-                  Edit
+                  Edit Client
                 </Link>
                 <button
                   onClick={() => handleDeleteClient(client.id)}

@@ -74,7 +74,7 @@ export function ImageGrid({ images, client, onStatusUpdate }: {
                 ${image.status === 'APPROVED' ? 'bg-green-100 text-green-800' : 
                   image.status === 'PASSED' ? 'bg-red-100 text-red-800' : 
                   'bg-gray-100 text-gray-800'}`}>
-                {image.status}
+                {image.status === 'PASSED' ? 'Not Approved' : image.status}
               </div>
             </div>
           </div>
@@ -97,7 +97,7 @@ export function ImageGrid({ images, client, onStatusUpdate }: {
               ${images[currentImageIndex].status === 'APPROVED' ? 'bg-green-100 text-green-800' : 
                 images[currentImageIndex].status === 'PASSED' ? 'bg-red-100 text-red-800' : 
                 'bg-gray-100 text-gray-800'}`}>
-              {images[currentImageIndex].status}
+              {images[currentImageIndex].status === 'PASSED' ? 'Not Approved' : images[currentImageIndex].status}
             </div>
             
             {isAdmin && (
@@ -159,7 +159,7 @@ export function ImageGrid({ images, client, onStatusUpdate }: {
                   className="flex-1 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:bg-gray-200"
                   disabled={images[currentImageIndex].status === 'PASSED'}
                 >
-                  Pass
+                  Not Approved
                 </button>
               </div>
             </div>
