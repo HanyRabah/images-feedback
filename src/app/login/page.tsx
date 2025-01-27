@@ -2,13 +2,17 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
+   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const hashParams =  window.location.hash || ''
+   
+  const redirectTo = `/client/${hashParams}` || '/client'
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -29,8 +33,8 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Invalid email or password')
       } else {
-        // Get session to determine redirect
-        router.push('/')
+        console.log("🚀 ~ handleSubmit ~ redirectTo:", redirectTo)
+        router.push(redirectTo)
         router.refresh()
       }
     } catch (error) {
