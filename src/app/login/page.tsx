@@ -3,17 +3,14 @@
 
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function LoginPage() {
-   const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [redirectUrl, setRedicrectUrl] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
-  const hashParams =  window.location.hash || ''
-   
-  const redirectTo = `/client/${hashParams}` || '/client'
-
-
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
@@ -33,8 +30,7 @@ export default function LoginPage() {
       if (result?.error) {
         setError('Invalid email or password')
       } else {
-        console.log("🚀 ~ handleSubmit ~ redirectTo:", redirectTo)
-        router.push(redirectTo)
+         router.push(redirectUrl)
         router.refresh()
       }
     } catch (error) {
@@ -44,6 +40,13 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    if(!window) return
+    const hashParams = new URLSearchParams(window.location.hash.slice(1))
+    const redirectTo = `/client/${hashParams}` || '/client'
+    setRedicrectUrl(redirectTo)
+  }, [])  
 
   return (
     <div className="container mx-auto p-6 max-w-md">
