@@ -2,9 +2,9 @@
 'use client'
 
 import { ImageGrid } from '@/components/ImageGrid'
-import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 type Folder = {
   id: string
@@ -21,9 +21,30 @@ export default function ClientDashboardView({
 }: { 
   folders: Folder[] 
 }) {
-  const router = useRouter()
+    const router = useRouter()
   const [activeTab, setActiveTab] = useState<string>('')
 
+  useEffect(() => {
+    if (folders.length === 0) return
+
+    const hash = window.location.hash.slice(1)
+    const validFolder = folders.find(folder => folder.name.toLowerCase().replace(/\s+/g, '-') === hash)
+    
+    if (validFolder) {
+      setActiveTab(hash)
+    } else {
+      setActiveTab(folders[0].id)
+      window.location.hash = folders[0].name.toLowerCase().replace(/\s+/g, '-')
+    }
+  }, [folders])
+
+  const handleTabChange = (folderId: string) => {
+    setActiveTab(folderId)
+    const folder = folders.find(f => f.id === folderId)
+    if (folder) {
+      window.location.hash = folder.name.toLowerCase().replace(/\s+/g, '-')
+    }
+  }
   // Set first tab as active by default
   useEffect(() => {
     if (folders.length > 0 && !activeTab) {
@@ -45,7 +66,7 @@ export default function ClientDashboardView({
               {folders.map((folder) => (
                 <button
                   key={folder.id}
-                  onClick={() => setActiveTab(folder.id)}
+                  onClick={() => handleTabChange(folder.id)}
                   className={cn(
                     'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
                     activeTab === folder.id
